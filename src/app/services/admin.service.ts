@@ -6,7 +6,13 @@ import {
     UserDto,
     ArtistDto,
     SongDto,
-    PlaylistDto
+    PlaylistDto,
+    PlatformSettingDto,
+    UpdateSettingDto,
+    SongReportDto,
+    ArtistEarningsDto,
+    EarningsSummaryDto,
+    WithdrawalDto
 } from '../models/admin.model';
 import { environment } from '../../environments/environment';
 
@@ -93,5 +99,68 @@ export class AdminService {
 
     deletePlaylist(id: string): Observable<void> {
         return this.http.delete<void>(`${environment.apiUrl}/playlists/${id}`);
+    }
+
+    // Settings
+    getSettings(): Observable<PlatformSettingDto[]> {
+        return this.http.get<PlatformSettingDto[]>(`${environment.apiUrl}/settings`);
+    }
+
+    updateSettings(updates: UpdateSettingDto[]): Observable<any> {
+        return this.http.patch(`${environment.apiUrl}/settings`, updates);
+    }
+
+    // Reports
+    getReports(status = 'Pending', page = 1, pageSize = 20): Observable<SongReportDto[]> {
+        let params = new HttpParams()
+            .set('status', status)
+            .set('page', page.toString())
+            .set('pageSize', pageSize.toString());
+        return this.http.get<SongReportDto[]>(`${environment.apiUrl}/reports`, { params });
+    }
+
+    getPendingReportsCount(): Observable<number> {
+        return this.http.get<number>(`${environment.apiUrl}/reports/count`);
+    }
+
+    banSong(reportId: string): Observable<any> {
+        return this.http.post(`${environment.apiUrl}/reports/${reportId}/ban`, {});
+    }
+
+    dismissReport(reportId: string): Observable<any> {
+        return this.http.post(`${environment.apiUrl}/reports/${reportId}/dismiss`, {});
+    }
+
+    // Earnings
+    getArtistEarnings(page = 1, pageSize = 20, search?: string): Observable<ArtistEarningsDto[]> {
+        let params = new HttpParams()
+            .set('page', page.toString())
+            .set('pageSize', pageSize.toString());
+        if (search) params = params.set('search', search);
+        return this.http.get<ArtistEarningsDto[]>(`${environment.apiUrl}/earnings/artists`, { params });
+    }
+
+    getEarningsSummary(): Observable<EarningsSummaryDto> {
+        return this.http.get<EarningsSummaryDto>(`${environment.apiUrl}/earnings/summary`);
+    }
+
+    getWithdrawals(status = 'Pending', page = 1, pageSize = 20): Observable<WithdrawalDto[]> {
+        let params = new HttpParams()
+            .set('status', status)
+            .set('page', page.toString())
+            .set('pageSize', pageSize.toString());
+        return this.http.get<WithdrawalDto[]>(`${environment.apiUrl}/earnings/withdrawals`, { params });
+    }
+
+    getPendingWithdrawalsCount(): Observable<number> {
+        return this.http.get<number>(`${environment.apiUrl}/earnings/withdrawals/count`);
+    }
+
+    approveWithdrawal(id: string): Observable<any> {
+        return this.http.post(`${environment.apiUrl}/earnings/withdrawals/${id}/approve`, {});
+    }
+
+    rejectWithdrawal(id: string): Observable<any> {
+        return this.http.post(`${environment.apiUrl}/earnings/withdrawals/${id}/reject`, {});
     }
 }

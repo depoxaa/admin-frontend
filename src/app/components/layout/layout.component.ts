@@ -1,7 +1,8 @@
-import { Component } from '@angular/core';
+import { Component, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
+import { AdminService } from '../../services/admin.service';
 
 @Component({
     selector: 'app-layout',
@@ -17,6 +18,19 @@ import { AuthService } from '../../services/auth.service';
           <a routerLink="/artists" routerLinkActive="active">🎤 Artists</a>
           <a routerLink="/songs" routerLinkActive="active">🎵 Songs</a>
           <a routerLink="/playlists" routerLinkActive="active">📋 Playlists</a>
+          <a routerLink="/reports" routerLinkActive="active">
+            🚩 Reports
+            @if (pendingReportsCount() > 0) {
+              <span class="badge">{{ pendingReportsCount() }}</span>
+            }
+          </a>
+          <a routerLink="/earnings" routerLinkActive="active">
+            💰 Earnings
+            @if (pendingWithdrawalsCount() > 0) {
+              <span class="badge">{{ pendingWithdrawalsCount() }}</span>
+            }
+          </a>
+          <a routerLink="/settings" routerLinkActive="active">⚙️ Settings</a>
         </nav>
         <div class="user-section">
           <div class="user-info">
@@ -74,6 +88,16 @@ import { AuthService } from '../../services/auth.service';
       background: linear-gradient(135deg, #6366f1, #8b5cf6);
       color: #fff;
     }
+    nav a { position: relative; display: flex; align-items: center; gap: 8px; }
+    .badge {
+      background: #ef4444;
+      color: #fff;
+      font-size: 11px;
+      font-weight: 600;
+      padding: 2px 7px;
+      border-radius: 10px;
+      margin-left: auto;
+    }
     .user-section {
       border-top: 1px solid rgba(255,255,255,0.1);
       padding-top: 16px;
@@ -103,6 +127,18 @@ import { AuthService } from '../../services/auth.service';
     }
   `]
 })
-export class LayoutComponent {
-    constructor(public authService: AuthService) { }
+export class LayoutComponent implements OnInit {
+    pendingReportsCount = signal(0);
+    pendingWithdrawalsCount = signal(0);
+
+    constructor(public authService: AuthService, private adminService: AdminService) { }
+
+    ngOnInit(): void {
+        this.adminService.getPendingReportsCount().subscribe({
+            next: (count) => this.pendingReportsCount.set(count)
+        });
+        this.adminService.getPendingWithdrawalsCount().subscribe({
+            next: (count) => this.pendingWithdrawalsCount.set(count)
+        });
+    }
 }

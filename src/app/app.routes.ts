@@ -8,6 +8,9 @@ export const routes: Routes = [
     { path: 'artists', loadComponent: () => import('./components/artists/artists.component').then(m => m.ArtistsComponent), canActivate: [authGuard] },
     { path: 'songs', loadComponent: () => import('./components/songs/songs.component').then(m => m.SongsComponent), canActivate: [authGuard] },
     { path: 'playlists', loadComponent: () => import('./components/playlists/playlists.component').then(m => m.PlaylistsComponent), canActivate: [authGuard] },
+    { path: 'settings', loadComponent: () => import('./components/settings/settings.component').then(m => m.SettingsComponent), canActivate: [authGuard] },
+    { path: 'reports', loadComponent: () => import('./components/reports/reports.component').then(m => m.ReportsComponent), canActivate: [authGuard] },
+    { path: 'earnings', loadComponent: () => import('./components/earnings/earnings.component').then(m => m.EarningsComponent), canActivate: [authGuard] },
     { path: '', redirectTo: '/dashboard', pathMatch: 'full' },
     { path: '**', redirectTo: '/dashboard' }
 ];
